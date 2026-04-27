@@ -57,5 +57,18 @@ function costfn(genes)
 end
 ```
 
-and the function always returns the cost. The first line transform real numbers into a permutation
-vector.
+and the function always returns the cost. The first line transforms real numbers into a permutation
+vector. A possible implementation of a cost function in a Traveling Salesman Problem seems like 
+
+```julia
+function costfn(genes)
+    decodedval = sortperm(genes)
+    totalcost = 0.0
+    p = length(decodedval)
+    for i in 1:(p-1)
+        totalcost += distances[decodedval[i], decodedval[i+1]]
+    end
+    totalcost += distances[decodedval[p], decodedval[1]]
+    return totalcost
+end
+```
