@@ -45,3 +45,17 @@ used the transform original chromosome into a permutation vector:
 ```julia
 decoded_solution = sortperm(best.genes)
 ```
+
+A cost function would be in form of
+
+```julia
+function costfn(genes)
+    decodedval = sortperm(genes)
+    ...
+    ...
+    return totalcost
+end
+```
+
+and the function always returns the cost. The first line transform real numbers into a permutation
+vector.
