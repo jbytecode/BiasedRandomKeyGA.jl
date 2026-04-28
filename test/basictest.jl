@@ -38,6 +38,47 @@
     end
 
 
+    @testset "Big (50) Permutation" verbose = true begin
+
+        function costfn(genes)
+            decodedval = sortperm(genes)
+            expected = collect(1:length(genes))     # 1, 2, ..., n
+            return sum(abs.(decodedval .- expected))
+        end
+
+
+        # Configuration.
+        ga = BRKGA(
+            300,   # population size
+            50,    # chromosome size
+            1,    # generations
+            0.7,   # alpha (for Uniform Crossover)
+            20,    # number of elites
+            20,    # number of mutants
+            costfn # cost function
+        )
+
+        population = create_population(ga)
+        iter = 0
+        best = population[1]
+        while true 
+            population = generation(ga, population)
+            best = population[1]
+            if iszero(best.cost)
+                @info "Optimal solution found in iteration $iter"
+                break
+            end
+            iter += 1
+            if iter > 10000
+                @warn "Failed to find the optimal solution within 10000 iterations."
+                break
+            end
+        end 
+        @test iszero(best.cost)
+
+    end
+
+
 
 
     @testset "Basic Traveling Salesman" verbose = true begin
