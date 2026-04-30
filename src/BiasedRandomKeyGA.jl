@@ -1,8 +1,10 @@
 module BiasedRandomKeyGA
 
 export BRKGA, Chromosome, Population
-export create_population, generation
+export create_population, generate_mutants
+export generation, generations
 export evaluate!
+export selectacrossoverfunction
 export make_uniform_crossover
 export make_pathrelinking_crossover
 
@@ -123,6 +125,13 @@ function generation(ga::BRKGA, population::Population)::Population
     end
 
     return new_population
+end 
+
+function generations(ga::BRKGA, population::Population, numgens::Int)::Population
+    for i in 1:numgens
+        population = generation(ga, population)
+    end
+    return population
 end 
 
 

@@ -28,11 +28,13 @@
         best = pop[1]
         while true 
             pop = generation(ga, pop)
-            evaluate!(ga, pop) # Ensure costs are updated after generation
-            best = argmin(c -> c.cost, pop)
-            if iszero(best.cost)
-                break   
-            end 
+            if iter % 100 == 0
+                evaluate!(ga, pop) # Ensure costs are updated after generation
+                best = argmin(c -> c.cost, pop)
+                if iszero(best.cost)
+                    break   
+                end 
+            end
             iter += 1
             if iter > 10000
                 @warn "Failed to find the optimal solution within 10000 iterations."
@@ -68,10 +70,12 @@
         best = population[1]
         while true 
             population = generation(ga, population)
-            evaluate!(ga, population) # Ensure costs are updated after generation
-            best = argmin(c -> c.cost, population)
-            if iszero(best.cost)
-                break
+            if iter % 100 == 0
+                evaluate!(ga, population) # Ensure costs are updated after generation
+                best = argmin(c -> c.cost, population)
+                if iszero(best.cost)
+                    break
+                end
             end
             iter += 1
             if iter > 10000
@@ -122,10 +126,12 @@
         best = pop[1]
         while true
             pop = generation(ga, pop)
-            evaluate!(ga, pop) # Ensure costs are updated after generation
-            best = argmin(c -> c.cost, pop)
-            if best.cost == 85.0
-                break
+            if iter % 100 == 0
+                evaluate!(ga, pop) # Ensure costs are updated after generation
+                best = argmin(c -> c.cost, pop)
+                if best.cost == 85.0
+                    break
+                end
             end
             iter += 1
             if iter > 10000
