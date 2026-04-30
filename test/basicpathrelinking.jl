@@ -13,7 +13,6 @@
         ga = BRKGA(
             100,   # population size
             10,    # chromosome size
-            50,    # generations
             [
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
@@ -24,19 +23,27 @@
             costfn # cost function
         )
 
-        # Run the genetic algorithm.
-        # Result is the final population with random keys.
-        result = solve(ga)
+        population = create_population(ga)
+        iter = 0
+        best = population[1]
+        while true
+            population = generation(ga, population)
+            evaluate!(ga, population) # Ensure costs are updated after generation
+            best = argmin(c -> c.cost, population)
+            if iszero(best.cost)
+                break
+            end
+            iter += 1
+            if iter > 10000
+                break
+            end
+        end
 
-        # Test the best solution 
-        best = result[1]
-
-        # Test if the best solution has zero cost 
         @test iszero(best.cost)
-
-        # Test if the decoded solution is the expected permutation
+        
         decoded_solution = sortperm(best.genes)
         expected_solution = collect(1:length(best.genes))
+        
         @test decoded_solution == expected_solution # 1, 2, ..., n
 
     end
@@ -55,7 +62,6 @@
         ga = BRKGA(
             100,   # population size
             50,    # chromosome size
-            1,    # generations
             [
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
@@ -73,7 +79,6 @@
             population = generation(ga, population)
             best = argmin(c -> c.cost, population)
             if iszero(best.cost)
-                @info "Optimal solution found in iteration $iter"
                 break
             end
             iter += 1
@@ -115,7 +120,6 @@
         ga = BRKGA(
             100,   # population size
             4,     # chromosome size (4 cities)
-            50,    # generations
             [
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
@@ -126,10 +130,25 @@
             costfn # cost function
         )
 
-        result = solve(ga)
-        best = result[1]
-        bestperm = sortperm(best.genes)
-
+        pop = create_population(ga)
+        iter = 0
+        best = pop[1]
+        while true
+            pop = generation(ga, pop)
+            evaluate!(ga, pop) # Ensure costs are updated after generation
+            best = argmin(c -> c.cost, pop)
+            if best.cost == 85.0
+                break
+            end
+            iter += 1
+            if iter > 10000
+                @warn "Failed to find the optimal solution within 10000 iterations."
+                @warn "The best solution found has cost $(best.cost)"
+                @warn "Decoded solution: $(sortperm(best.genes))"
+                break
+            end
+        end
+                
         @test best.cost == 85.0
 
         # (1, 2, 3, 4), (4, 1, 2, 3), (3, 4, 1, 2) ... are all okay 

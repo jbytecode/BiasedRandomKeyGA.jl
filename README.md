@@ -16,59 +16,59 @@ pkg> add https://github.com/jbytecode/BiasedRandomKeyGA.jl
 The implementation requires the parameters in a single struct `BRKGA`: 
 
 ```julia
-ga = BRKGA(
+        ga = BRKGA(
             100,   # population size
-            10,    # chromosome size
-            50,    # generations
-            0.7,   # alpha (for Uniform Crossover)
+            50,    # chromosome size
+            [
+                make_uniform_crossover(0.7),
+                make_pathrelinking_crossover(0.1)
+            ], # Multiple crossover functions
+            [0.7, 0.3], # Crossover function probabilities
             10,    # number of elites
-            20,    # number of mutants
+            10,    # number of mutants
             costfn # cost function
         )
 ```
 
-The `solve` method calculates the steps:
+Creating an initial population:
 
 ```julia
-solve(ga)
+        pop = create_population(ga)
 ```
 
-The `solve` method returns the sorted population. The best solution can be handled using 
+Iterating the population: 
 
 ```julia
-best = result[1]
+        pop = generation(ga, pop)
 ```
 
-Since the chromosomes are encoded using real values, an `encoder` function can be 
-used the transform original chromosome into a permutation vector:
+Iterating the population 100 times: 
 
 ```julia
-decoded_solution = sortperm(best.genes)
+        for i in 1:100
+            pop = generation(ga, pop)
+        end
 ```
 
-A cost function would be in form of
+Getting the final results:
 
 ```julia
-function costfn(genes)
-    decodedval = sortperm(genes)
-    ...
-    ...
-    return totalcost
-end
+        evaluate!(ga, pop) # Ensure costs are updated before finding the best solution
+        best = argmin(c -> c.cost, pop)
 ```
 
-and the function always returns the cost. The first line transforms real numbers into a permutation
-vector. A possible implementation of a cost function in a Traveling Salesman Problem seems like 
+
+A sample cost function:
 
 ```julia
-function costfn(genes)
-    decodedval = sortperm(genes)
-    totalcost = 0.0
-    p = length(decodedval)
-    for i in 1:(p-1)
-        totalcost += distances[decodedval[i], decodedval[i+1]]
-    end
-    totalcost += distances[decodedval[p], decodedval[1]]
-    return totalcost
+function costfn(chromosome)
+    # Decode first
+    solution = sortperm(chromosome.genes)
+    
+    # Do calculations 
+    # ....
+
+    # Return the cost value. Objective is to minimize this value.
+    return cost_value
 end
 ```

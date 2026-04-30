@@ -2,7 +2,7 @@ module BiasedRandomKeyGA
 
 export BRKGA, Chromosome, Population
 export create_population, generation
-export evaluate!, solve
+export evaluate!
 export make_uniform_crossover
 export make_pathrelinking_crossover
 
@@ -16,7 +16,6 @@ end
 struct BRKGA
     population_size::Int
     chromosome_size::Int
-    generations::Int
     crossoverfunctions::Vector{Function}
     crossoveropprobs::Vector{Float64}
     numelites::Int
@@ -125,21 +124,6 @@ function generation(ga::BRKGA, population::Population)::Population
 
     return new_population
 end 
-
-
-
-function solve(ga::BRKGA)
-    population = create_population(ga)
-    for _ in 1:ga.generations
-        population = generation(ga, population)
-    end
-    evaluate!(ga, population) # Final evaluation to get the best solution
-    population
-end 
-
-
-
-
 
 
 
