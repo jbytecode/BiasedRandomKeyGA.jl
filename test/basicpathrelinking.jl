@@ -1,6 +1,6 @@
-@testset "Basic Tests" verbose = true begin
+@testset "Basic Path Relinking Tests" verbose = true begin
 
-    @testset "Basic Permutation" verbose = true begin
+    @testset "Basic Permutation with Path Relinking" verbose = true begin
 
         function costfn(genes)
             decodedval = sortperm(genes)
@@ -14,7 +14,10 @@
             100,   # population size
             10,    # chromosome size
             50,    # generations
-            [make_uniform_crossover(0.7)], # crossover function
+            [
+                make_uniform_crossover(0.7),
+                make_pathrelinking_crossover(0.1)
+            ], # Multiple crossover functions
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function
@@ -38,7 +41,7 @@
     end
 
 
-    @testset "Big (50) Permutation" verbose = true begin
+    @testset "1:50 Permutation" verbose = true begin
 
         function costfn(genes)
             decodedval = sortperm(genes)
@@ -52,16 +55,19 @@
             100,   # population size
             50,    # chromosome size
             1,    # generations
-            [make_uniform_crossover(0.7)], # crossover function
-            20,    # number of elites
-            20,    # number of mutants
+            [
+                make_uniform_crossover(0.7),
+                make_pathrelinking_crossover(0.1)
+            ], # Multiple crossover functions
+            10,    # number of elites
+            10,    # number of mutants
             costfn # cost function
         )
 
         population = create_population(ga)
         iter = 0
         best = population[1]
-        while true 
+        while true
             population = generation(ga, population)
             best = argmin(c -> c.cost, population)
             if iszero(best.cost)
@@ -71,9 +77,11 @@
             iter += 1
             if iter > 10000
                 @warn "Failed to find the optimal solution within 10000 iterations."
+                @warn "The best solution found has cost $(best.cost)"
+                @warn "Decoded solution: $(sortperm(best.genes))"
                 break
             end
-        end 
+        end
         @test iszero(best.cost)
 
     end
@@ -106,7 +114,10 @@
             100,   # population size
             4,     # chromosome size (4 cities)
             50,    # generations
-            [make_uniform_crossover(0.7)], # crossover function
+            [
+                make_uniform_crossover(0.7),
+                make_pathrelinking_crossover(0.1)
+            ], # Multiple crossover functions
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function

@@ -1,6 +1,9 @@
 using Test
 using BiasedRandomKeyGA
 
+const do_basic_test = true
+const do_pathrelinking_test = true
 
-include("basictest.jl")
+do_basic_test && include("basictest.jl")
+do_pathrelinking_test && include("basicpathrelinking.jl")
 

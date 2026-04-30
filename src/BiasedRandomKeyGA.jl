@@ -1,8 +1,11 @@
 module BiasedRandomKeyGA
 
-export BRKGA, Chromosome
+export BRKGA, Chromosome, Population
 export create_population, generation
 export evaluate!, solve
+export make_uniform_crossover
+export make_pathrelinking_crossover
+
 
 mutable struct Chromosome
     genes::Vector{Float64}
@@ -14,7 +17,7 @@ struct BRKGA
     population_size::Int
     chromosome_size::Int
     generations::Int
-    alpha::Float64
+    crossoverfunctions::Vector{Function}
     numelites::Int
     nummutants::Int
     costfn::Function
@@ -24,12 +27,30 @@ const Population = Vector{Chromosome}
 
 Chromosome(n::Int) = Chromosome(rand(n), Inf)
 
-function uniform_crossover(ga::BRKGA, elitistc::Chromosome, c::Chromosome)
-    n = length(elitistc.genes)
-    alpha = ga.alpha
-    child_genes = [rand() < alpha ? elitistc.genes[i] : c.genes[i] for i in 1:n]
-    return Chromosome(child_genes, Inf)
-end 
+function make_uniform_crossover(alpha::Float64)::Function
+    return (ga::BRKGA, elitistc::Chromosome, c::Chromosome) -> begin
+        n = length(elitistc.genes)
+        child_genes = [rand() < alpha ? elitistc.genes[i] : c.genes[i] for i in 1:n]
+        return Chromosome(child_genes, Inf)
+    end
+end
+
+function make_pathrelinking_crossover(sigma::Float64)::Function
+    return (ga::BRKGA, elite::Chromosome, other::Chromosome) -> begin
+        kmax = Int(floor(1 / sigma))
+        bestcost = Inf
+        bestgenes = Array{Float64}(undef, length(elite.genes))
+        for k in 1:kmax
+            offgenes = other.genes .+ (k * sigma) * (elite.genes .- other.genes)
+            cost = ga.costfn(offgenes)
+            if cost < bestcost
+                bestcost = cost
+                bestgenes .= offgenes
+            end
+        end
+        return Chromosome(bestgenes, bestcost)
+    end
+end
 
 function generate_mutants(ga::BRKGA)
     return [Chromosome(ga.chromosome_size) for _ in 1:ga.nummutants]
@@ -39,6 +60,11 @@ function create_population(ga::BRKGA)
     return [Chromosome(ga.chromosome_size) for _ in 1:ga.population_size]
 end 
 
+function evaluate!(ga::BRKGA, chrom::Chromosome)::Nothing
+    chrom.cost = ga.costfn(chrom.genes)
+    return nothing
+end
+
 function evaluate!(ga::BRKGA, population::Population)::Nothing
     for chrom in population
         chrom.cost = ga.costfn(chrom.genes)
@@ -47,6 +73,9 @@ function evaluate!(ga::BRKGA, population::Population)::Nothing
 end
 
 function generation(ga::BRKGA, population::Population)
+    # Crossover function
+    crossfn = rand(ga.crossoverfunctions)
+
     # Evaluate the cost of each chromosome
     evaluate!(ga, population)
 
@@ -66,7 +95,7 @@ function generation(ga::BRKGA, population::Population)
     while length(new_population) < ga.population_size
         elitistc = rand(elites)
         c = rand(population[ga.numelites+1:end]) # Select from non-elites
-        child = uniform_crossover(ga, elitistc, c)
+        child = crossfn(ga, elitistc, c)
         push!(new_population, child)
     end
 
