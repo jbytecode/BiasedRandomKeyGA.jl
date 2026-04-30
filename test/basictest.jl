@@ -15,6 +15,7 @@
             10,    # chromosome size
             50,    # generations
             [make_uniform_crossover(0.7)], # crossover function
+            [1.0], # crossover function probabilities
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function
@@ -53,6 +54,7 @@
             50,    # chromosome size
             1,    # generations
             [make_uniform_crossover(0.7)], # crossover function
+            [1.0], # crossover function probabilities
             20,    # number of elites
             20,    # number of mutants
             costfn # cost function
@@ -107,6 +109,7 @@
             4,     # chromosome size (4 cities)
             50,    # generations
             [make_uniform_crossover(0.7)], # crossover function
+            [1.0], # crossover function probabilities
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function

@@ -2,5 +2,3 @@ name = "BiasedRandomKeyGA"
 uuid = "f11c9b94-e4b5-4783-8c81-edffebf0e26a"
 version = "0.1.0"
 authors = ["jbytecode <mhsatman@gmail.com>"]
-
-[deps]

@@ -18,6 +18,7 @@
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
             ], # Multiple crossover functions
+            [0.7, 0.3], # Crossover function probabilities. Uniform crossover is more likely than path relinking.
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function
@@ -59,6 +60,7 @@
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
             ], # Multiple crossover functions
+            [0.7, 0.3], # Crossover function probabilities
             10,    # number of elites
             10,    # number of mutants
             costfn # cost function
@@ -118,6 +120,7 @@
                 make_uniform_crossover(0.7),
                 make_pathrelinking_crossover(0.1)
             ], # Multiple crossover functions
+            [0.7, 0.3], # Crossover function probabilities. Uniform crossover is more likely than path relinking.
             10,    # number of elites
             20,    # number of mutants
             costfn # cost function
