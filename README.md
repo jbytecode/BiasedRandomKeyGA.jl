@@ -18,45 +18,51 @@ pkg> add https://github.com/jbytecode/BiasedRandomKeyGA.jl
 The implementation requires the parameters in a single struct `BRKGA`: 
 
 ```julia
-        ga = BRKGA(
-            100,   # population size
-            50,    # chromosome size
-            [
-                make_uniform_crossover(0.7),
-                make_pathrelinking_crossover(0.1)
-            ], # Multiple crossover functions
-            [0.7, 0.3], # Crossover function probabilities
-            10,    # number of elites
-            10,    # number of mutants
-            costfn # cost function
-        )
+ga = BRKGA(
+    100,   # population size
+    50,    # chromosome size
+    [
+        make_uniform_crossover(0.7),
+        make_pathrelinking_crossover(0.1)
+    ], # Multiple crossover functions
+    [0.7, 0.3], # Crossover function probabilities
+    10,    # number of elites
+    10,    # number of mutants
+    costfn # cost function
+)
 ```
 
 Creating an initial population:
 
 ```julia
-        pop = create_population(ga)
+pop = create_population(ga)
 ```
 
 Iterating the population: 
 
 ```julia
-        pop = generation(ga, pop)
+pop = generation(ga, pop)
 ```
 
 Iterating the population 100 times: 
 
 ```julia
-        for i in 1:100
-            pop = generation(ga, pop)
-        end
+for i in 1:100
+    pop = generation(ga, pop)
+end
+```
+
+or similary
+
+```julia
+pop = generations(ga, pop, 100)
 ```
 
 Getting the final results:
 
 ```julia
-        evaluate!(ga, pop) # Ensure costs are updated before finding the best solution
-        best = argmin(c -> c.cost, pop)
+evaluate!(ga, pop) # Ensure costs are updated before finding the best solution
+best = argmin(c -> c.cost, pop)
 ```
 
 
