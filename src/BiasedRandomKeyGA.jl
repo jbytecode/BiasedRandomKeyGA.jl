@@ -7,6 +7,7 @@ export evaluate!
 export selectacrossoverfunction
 export make_uniform_crossover
 export make_pathrelinking_crossover
+export createsimplega
 
 
 mutable struct Chromosome
@@ -28,6 +29,13 @@ end
 const Population = Vector{Chromosome}
 
 Chromosome(n::Int) = Chromosome(rand(n), Inf)
+
+
+function createsimplega(costfn::Function, chromosomesize::Int)::BRKGA
+    crossoverfunctions = [make_uniform_crossover(0.7), make_pathrelinking_crossover(0.1)]
+    crossoveropprobs = [0.8, 0.2]
+    return BRKGA(100, chromosomesize, crossoverfunctions, crossoveropprobs, 10, 10, costfn)
+end
 
 function make_uniform_crossover(alpha::Float64)::Function
     return (ga::BRKGA, elitistc::Chromosome, c::Chromosome) -> begin
