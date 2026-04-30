@@ -20,27 +20,27 @@
             costfn # cost function
         )
 
-       
+
         # Run the genetic algorithm.
         # Result is the final population with random keys.
         pop = create_population(ga)
         iter = 0
         best = pop[1]
-        while true 
+        while true
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
                 best = argmin(c -> c.cost, pop)
                 if iszero(best.cost)
-                    break   
-                end 
+                    break
+                end
             end
             iter += 1
             if iter > 10000
                 @warn "Failed to find the optimal solution within 10000 iterations."
                 break
-            end 
-        end 
+            end
+        end
         @test iszero(best.cost)
     end
 
@@ -68,7 +68,7 @@
         population = create_population(ga)
         iter = 0
         best = population[1]
-        while true 
+        while true
             population = generation(ga, population)
             if iter % 100 == 0
                 evaluate!(ga, population) # Ensure costs are updated after generation
@@ -82,7 +82,7 @@
                 @warn "Failed to find the optimal solution within 10000 iterations."
                 break
             end
-        end 
+        end
         @test iszero(best.cost)
 
     end
@@ -120,7 +120,7 @@
             20,    # number of mutants
             costfn # cost function
         )
-        
+
         pop = create_population(ga)
         iter = 0
         best = pop[1]
@@ -142,7 +142,7 @@
             end
         end
         @test best.cost == 85.0
-        
+
 
         # (1, 2, 3, 4), (4, 1, 2, 3), (3, 4, 1, 2) ... are all okay 
         # So I don't want to test for a specific permutation. 

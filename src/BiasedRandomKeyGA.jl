@@ -12,7 +12,7 @@ export make_pathrelinking_crossover
 mutable struct Chromosome
     genes::Vector{Float64}
     cost::Float64
-end 
+end
 
 
 struct BRKGA
@@ -53,22 +53,26 @@ the best solution found along the path.
 
 # Arguments
 
-- `sigma::Float64`: A parameter that controls the step size along the path between the two parent chromosomes. 
-  A smaller sigma results in more fine-grained exploration, while a larger sigma allows for more aggressive moves towards the elite chromosome.
+- `sigma::Float64`: A parameter that controls the step size along the path between the two parent 
+  chromosomes. A smaller sigma results in more fine-grained exploration, while a larger sigma allows 
+  for more aggressive moves towards the elite chromosome.
 
 # Returns
 
-- `Function`: A crossover function that can be used in the BRKGA framework to generate offspring based on path-relinking between an elite chromosome and another chromosome.
+- `Function`: A crossover function that can be used in the BRKGA framework to generate offspring 
+   based on path-relinking between an elite chromosome and another chromosome.
 
 # References
 
-- Noronha, Thiago F., and Celso C. Ribeiro. "Biased random-key genetic algorithms: A tutorial with applications." Proceedings of the 2024 8th International Conference on Intelligent Systems, Metaheuristics & Swarm Intelligence. 2024.
+- Noronha, Thiago F., and Celso C. Ribeiro. "Biased random-key genetic algorithms: 
+  A tutorial with applications." Proceedings of the 2024 8th International Conference 
+  on Intelligent Systems, Metaheuristics & Swarm Intelligence. 2024.
 """
 function make_pathrelinking_crossover(sigma::Float64)::Function
     return (ga::BRKGA, elite::Chromosome, other::Chromosome) -> begin
         kmax = Int(floor(1 / sigma))
         bestgenes = Array{Float64}(undef, ga.chromosome_size)
-        offgenes  = Array{Float64}(undef, ga.chromosome_size)
+        offgenes = Array{Float64}(undef, ga.chromosome_size)
         bestcost = Inf
 
         for k in 1:kmax
@@ -89,7 +93,7 @@ function generate_mutants(ga::BRKGA)::Vector{Chromosome}
         mutants[i] = Chromosome(ga.chromosome_size)
     end
     return mutants
-end 
+end
 
 function create_population(ga::BRKGA)::Population
     population = Vector{Chromosome}(undef, ga.population_size)
@@ -131,7 +135,7 @@ function generation(ga::BRKGA, population::Population)::Population
     evaluate!(ga, population)
 
     # Sort the population by cost
-    sort!(population, by = c -> c.cost)
+    sort!(population, by=c -> c.cost)
 
     # Select elites
     elites = population[1:ga.numelites]
@@ -152,14 +156,14 @@ function generation(ga::BRKGA, population::Population)::Population
     end
 
     return new_population
-end 
+end
 
 function generations(ga::BRKGA, population::Population, numgens::Int)::Population
     for i in 1:numgens
         population = generation(ga, population)
     end
     return population
-end 
+end
 
 
 
