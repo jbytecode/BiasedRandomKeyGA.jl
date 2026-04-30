@@ -55,10 +55,13 @@ struct BRKGA
     costfn::Function
 end
 
+
+# Type alias for a population of chromosomes
 const Population = Vector{Chromosome}
 
-Chromosome(n::Int) = Chromosome(rand(n), Inf)
 
+# Constructor for Chromosome that initializes genes with random values and cost with Inf
+Chromosome(n::Int) = Chromosome(rand(n), Inf)
 
 
 
@@ -171,6 +174,7 @@ function make_pathrelinking_crossover(sigma::Float64)::Function
     end
 end
 
+# Function to generate mutant chromosomes
 function generate_mutants(ga::BRKGA)::Vector{Chromosome}
     mutants = Vector{Chromosome}(undef, ga.nummutants)
     for i in 1:ga.nummutants
@@ -179,6 +183,7 @@ function generate_mutants(ga::BRKGA)::Vector{Chromosome}
     return mutants
 end
 
+# Function to create an initial population of chromosomes
 function create_population(ga::BRKGA)::Population
     population = Vector{Chromosome}(undef, ga.population_size)
     for i in 1:ga.population_size
@@ -187,17 +192,20 @@ function create_population(ga::BRKGA)::Population
     return population
 end
 
+# Evaluate the cost of a single chromosome
 function evaluate!(ga::BRKGA, chrom::Chromosome)::Nothing
     chrom.cost = ga.costfn(chrom.genes)
     return nothing
 end
 
+# Evaluate the cost of each chromosome in the population
 function evaluate!(ga::BRKGA, population::Population)::Nothing
     for chrom in population
         evaluate!(ga, chrom)
     end
     return nothing
 end
+
 
 function selectacrossoverfunction(ga::BRKGA)::Function
     weights = ga.crossoveropprobs
