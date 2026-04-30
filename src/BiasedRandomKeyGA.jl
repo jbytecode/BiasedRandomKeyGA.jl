@@ -16,6 +16,35 @@ mutable struct Chromosome
 end
 
 
+
+
+"""
+    struct BRKGA
+
+    The `BRKGA` struct represents a Biased Random-Key Genetic Algorithm (BRKGA) instance. 
+    It encapsulates all the parameters and configurations necessary to run the algorithm, 
+    including population size, chromosome size, crossover functions, probabilities for selecting 
+    crossover functions, number of elite chromosomes, number of mutants, and the cost function used
+    to evaluate the fitness of chromosomes.    
+
+# Fields
+
+- `population_size::Int`: The number of chromosomes in the population.
+- `chromosome_size::Int`: The number of genes in each chromosome.
+- `crossoverfunctions::Vector{Function}`: A vector of crossover functions that can be used to 
+   generate offspring from parent chromosomes.
+- `crossoveropprobs::Vector{Float64}`: A vector of probabilities corresponding to each crossover 
+   function, indicating the likelihood of selecting each function during the crossover process.
+- `numelites::Int`: The number of elite chromosomes that are preserved in each generation without modification.
+- `nummutants::Int`: The number of mutant chromosomes that are generated randomly in each generation to 
+   maintain diversity in the population.
+- `costfn::Function`: A function that takes a chromosome's genes as input and returns a cost value, 
+   which is used to evaluate the quality of the chromosome in the context of the optimization problem being solved.
+   In a BRKGA search, genes are passed directly to the cost function, which is responsible for interpreting 
+   the genes and calculating the corresponding cost based on the specific problem domain. For example, 
+   in a permutation-based problem, the cost function would need to decode the random keys into a permutation, possibly
+   using the sortperm function. 
+"""
 struct BRKGA
     population_size::Int
     chromosome_size::Int
@@ -31,12 +60,59 @@ const Population = Vector{Chromosome}
 Chromosome(n::Int) = Chromosome(rand(n), Inf)
 
 
+
+
+"""
+    createsimplega(costfn::Function, chromosomesize::Int)::BRKGA
+
+    Creates a simple BRKGA instance with default parameters for population size, crossover functions,
+    crossover probabilities, number of elites, and number of mutants. The user can specify the cost 
+    function and chromosome size, while the other parameters are set to commonly used defaults for a 
+    basic BRKGA implementation.
+
+# Arguments
+
+- `costfn::Function`: A function that takes a chromosome's genes as input and returns a cost value, 
+   which is used to evaluate the quality of the chromosome in the context of the optimization problem being solved.
+- `chromosomesize::Int`: The number of genes in each chromosome, which determines the dimensionality of the 
+   olution space being explored by the BRKGA.
+
+# Notes
+
+The default parameters used in this function are:
+- `population_size`: 100
+- `crossoverfunctions`: A vector containing a uniform crossover function with alpha = 0.7 
+   and a path-relinking crossover function with sigma = 0.1.
+- `crossoveropprobs`: A vector of probabilities corresponding to each crossover function, 
+   indicating the likelihood of selecting each function during the crossover process. 
+   In this case, the uniform crossover function has an 80% chance of being selected, while the
+   path-relinking crossover function has a 20% chance of being selected.
+- `numelites`: 10
+- `nummutants`: 10
+"""
 function createsimplega(costfn::Function, chromosomesize::Int)::BRKGA
     crossoverfunctions = [make_uniform_crossover(0.7), make_pathrelinking_crossover(0.1)]
     crossoveropprobs = [0.8, 0.2]
     return BRKGA(100, chromosomesize, crossoverfunctions, crossoveropprobs, 10, 10, costfn)
 end
 
+
+
+"""
+    make_uniform_crossover(alpha::Float64)::Function
+
+Creates a uniform crossover function with the given alpha parameter.
+This alpha parameter controls the bias towards the elite chromosome during crossover. 
+
+# Arguments
+- `alpha::Float64`: A value between 0 and 1 that determines the probability of inheriting a 
+   gene from the elite chromosome. A higher alpha means a stronger bias towards the elite 
+   chromosome, while a lower alpha allows for more diversity in the offspring.
+
+# Returns
+- `Function`: A crossover function that can be used in the BRKGA framework to generate offspring 
+   based on a uniform crossover between an elite chromosome and another chromosome.
+"""
 function make_uniform_crossover(alpha::Float64)::Function
     return (ga::BRKGA, elitistc::Chromosome, c::Chromosome) -> begin
         n = length(elitistc.genes)
