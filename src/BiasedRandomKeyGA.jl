@@ -124,18 +124,18 @@ end
    based on the BLX-alpha crossover method between two parent chromosomes.
 """
 function make_blx_crossover(alpha=0.5)
-    return (parent1, parent2) -> begin
-        n = length(parent1)
-        child = similar(parent1)
+    return (ga::BRKGA, parent1::Chromosome, parent2::Chromosome) -> begin
+        n = length(parent1.genes)
+        child = similar(parent1.genes)
         for i in 1:n
-            x1, x2 = parent1[i], parent2[i]
+            x1, x2 = parent1.genes[i], parent2.genes[i]
             d = abs(x1 - x2)
             lower = min(x1, x2) - alpha * d
             upper = max(x1, x2) + alpha * d
             # Clamp the child gene to be within [0, 1]
             child[i] = clamp(lower + rand() * (upper - lower), 0.0, 1.0)
         end
-        return child
+        return Chromosome(child, Inf)
     end
 end
 
@@ -162,13 +162,13 @@ end
    based on the Simulated Binary Crossover method between two parent chromosomes.
 """
 function make_sbx_crossover(nc = 20.0)
-    return (p1, p2) -> begin
-        n = length(p1)
-        c1 = similar(p1)
-        c2 = similar(p2)
+    return (ga::BRKGA, p1::Chromosome, p2::Chromosome) -> begin
+        n = length(p1.genes)
+        c1 = similar(p1.genes)
+        c2 = similar(p2.genes)
         
         for i in 1:n
-            if rand() <= 0.5 && abs(p1[i] - p2[i]) > 1e-9
+            if rand() <= 0.5 && abs(p1.genes[i] - p2.genes[i]) > 1e-9
                 u = rand()
                 if u <= 0.5
                     betaq = (2u)^(1/(nc + 1))
@@ -176,14 +176,14 @@ function make_sbx_crossover(nc = 20.0)
                     betaq = (1/(2*(1-u)))^(1/(nc + 1))
                 end
                 
-                c1[i] = clamp(0.5 * ((1 + betaq)*p1[i] + (1 - betaq)*p2[i]), 0.0, 1.0)
-                c2[i] = clamp(0.5 * ((1 - betaq)*p1[i] + (1 + betaq)*p2[i]), 0.0, 1.0)
+                c1[i] = clamp(0.5 * ((1 + betaq)*p1.genes[i] + (1 - betaq)*p2.genes[i]), 0.0, 1.0)
+                c2[i] = clamp(0.5 * ((1 - betaq)*p1.genes[i] + (1 + betaq)*p2.genes[i]), 0.0, 1.0)
             else
                 # If the parents are very close or by random chance, just copy the genes
-                c1[i], c2[i] = p1[i], p2[i]
+                c1[i], c2[i] = p1.genes[i], p2.genes[i]
             end
         end
-        return rand() < 0.5 ? c1 : c2
+        return rand() < 0.5 ? Chromosome(c1, Inf) : Chromosome(c2, Inf)
     end
 end
 
