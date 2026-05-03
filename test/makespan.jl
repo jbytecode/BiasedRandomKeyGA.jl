@@ -299,4 +299,57 @@ end
     
         @test best.cost == bestcost
     end 
+
+
+    @testset "Makespan with 10 tasks and 3 machines" begin 
+
+        times = [ 92  3  25;
+                  76  4  49;
+                  40  5  48;
+                  17  1  50;
+                  69  1  29;
+                   6  3  31;
+                  31  5  63;
+                  73  3  88;
+                  59  5  77;
+                  96  1  15]
+    
+        bestcost = 575 
+
+        function makespancostfn(genes::Vector{Float64})::Float64
+            permutation = sortperm(genes)
+            return makespan(times, permutation)
+        end
+
+        ga = BRKGA(
+            100,   # population size
+            10,    # chromosome size
+            [make_uniform_crossover(0.7)], # crossover function
+            [1.0], # crossover function probabilities
+            20,    # number of elites
+            20,    # number of mutants
+            makespancostfn # cost function
+        )
+
+        pop = create_population(ga)
+        maxiter = 10000
+        iter = 0
+        for i in 1:maxiter
+            pop = generation(ga, pop)
+            if iter % 100 == 0
+                evaluate!(ga, pop) # Ensure costs are updated after generation
+                best = argmin(c -> c.cost, pop)
+                if best.cost == bestcost
+                    break   
+                end 
+            end 
+            iter += 1
+        end 
+
+        evaluate!(ga, pop) # Ensure costs are updated after generation
+
+        best = argmin(c -> c.cost, pop)
+    
+        @test best.cost == bestcost
+    end 
 end 
