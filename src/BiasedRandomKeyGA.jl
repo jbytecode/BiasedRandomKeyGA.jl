@@ -7,6 +7,8 @@ export evaluate!
 export selectacrossoverfunction
 export make_uniform_crossover
 export make_pathrelinking_crossover
+export make_blx_crossover
+export make_sbx_crossover
 export createsimplega
 
 
@@ -100,6 +102,90 @@ function createsimplega(costfn::Function, chromosomesize::Int)::BRKGA
 end
 
 
+"""
+
+    make_blx_crossover(alpha::Float64)::Function
+
+    Creates a BLX-alpha crossover function with the given alpha parameter. 
+    The returned function takes two parent chromosomes and generates a child chromosome 
+    by creating genes that are randomly selected from a range defined by the corresponding 
+    genes of the two parents, expanded by a factor of alpha. This allows for exploration 
+    of the solution space around the parents while maintaining some bias towards their gene values.
+
+# Arguments
+
+- `alpha::Float64`: A value between 0 and 1 that determines the extent of the range from which 
+   the child genes are selected. A higher alpha allows for a wider range of possible gene values, 
+   while a lower alpha restricts the child genes to be closer to the parent genes.
+
+# Returns
+
+- `Function`: A crossover function that can be used in the BRKGA framework to generate offspring 
+   based on the BLX-alpha crossover method between two parent chromosomes.
+"""
+function make_blx_crossover(alpha=0.5)
+    return (parent1, parent2) -> begin
+        n = length(parent1)
+        child = similar(parent1)
+        for i in 1:n
+            x1, x2 = parent1[i], parent2[i]
+            d = abs(x1 - x2)
+            lower = min(x1, x2) - alpha * d
+            upper = max(x1, x2) + alpha * d
+            # Clamp the child gene to be within [0, 1]
+            child[i] = clamp(lower + rand() * (upper - lower), 0.0, 1.0)
+        end
+        return child
+    end
+end
+
+
+
+"""
+    make_sbx_crossover(nc::Float64)::Function
+
+    Creates a Simulated Binary Crossover (SBX) function with the given distribution index (nc). 
+    The returned function takes two parent chromosomes and generates a child chromosome by simulating 
+    the binary crossover process in a continuous search space. The distribution index controls the 
+    spread of the offspring around the parents, with a higher nc resulting in offspring that are 
+    closer to the parents, and a lower nc allowing for more diverse offspring.
+
+# Arguments
+
+- `nc::Float64`: The distribution index for the SBX crossover, which controls the spread of the 
+   offspring around the parents. A higher nc results in offspring that are closer to the parents, 
+   while a lower nc allows for more diverse offspring.
+
+# Returns
+
+- `Function`: A crossover function that can be used in the BRKGA framework to generate offspring 
+   based on the Simulated Binary Crossover method between two parent chromosomes.
+"""
+function make_sbx_crossover(nc = 20.0)
+    return (p1, p2) -> begin
+        n = length(p1)
+        c1 = similar(p1)
+        c2 = similar(p2)
+        
+        for i in 1:n
+            if rand() <= 0.5 && abs(p1[i] - p2[i]) > 1e-9
+                u = rand()
+                if u <= 0.5
+                    betaq = (2u)^(1/(nc + 1))
+                else
+                    betaq = (1/(2*(1-u)))^(1/(nc + 1))
+                end
+                
+                c1[i] = clamp(0.5 * ((1 + betaq)*p1[i] + (1 - betaq)*p2[i]), 0.0, 1.0)
+                c2[i] = clamp(0.5 * ((1 - betaq)*p1[i] + (1 + betaq)*p2[i]), 0.0, 1.0)
+            else
+                # If the parents are very close or by random chance, just copy the genes
+                c1[i], c2[i] = p1[i], p2[i]
+            end
+        end
+        return rand() < 0.5 ? c1 : c2
+    end
+end
 
 """
     make_uniform_crossover(alpha::Float64)::Function
