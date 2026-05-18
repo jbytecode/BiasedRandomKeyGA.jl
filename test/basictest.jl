@@ -36,8 +36,8 @@
                 end
             end
             iter += 1
-            if iter > 10000
-                @warn "Failed to find the optimal solution within 10000 iterations."
+            if iter > MAXITER
+                @warn "Failed to find the optimal solution within $MAXITER iterations."
                 break
             end
         end
@@ -78,8 +78,8 @@
                 end
             end
             iter += 1
-            if iter > 10000
-                @warn "Failed to find the optimal solution within 10000 iterations."
+            if iter > MAXITER
+                @warn "Failed to find the optimal solution within $MAXITER iterations."
                 break
             end
         end
@@ -134,8 +134,8 @@
                 end
             end
             iter += 1
-            if iter > 10000
-                @warn "Failed to find the optimal solution within 10000 iterations."
+            if iter > MAXITER
+                @warn "Failed to find the optimal solution within $MAXITER iterations."
                 @warn "The best solution found has cost $(best.cost)"
                 @warn "Decoded solution: $(sortperm(best.genes))"
                 break

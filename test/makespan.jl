@@ -71,9 +71,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
@@ -124,9 +123,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
@@ -176,9 +174,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
@@ -228,9 +225,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
@@ -279,9 +275,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation
@@ -332,9 +327,8 @@ end
         )
 
         pop = create_population(ga)
-        maxiter = 10000
         iter = 0
-        for i in 1:maxiter
+        for i in 1:MAXITER
             pop = generation(ga, pop)
             if iter % 100 == 0
                 evaluate!(ga, pop) # Ensure costs are updated after generation

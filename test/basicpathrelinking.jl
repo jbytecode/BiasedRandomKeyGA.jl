@@ -1,5 +1,6 @@
 @testset "Basic Path Relinking Tests" verbose = true begin
 
+
     @testset "Basic Permutation with Path Relinking" verbose = true begin
 
         function costfn(genes)
@@ -41,7 +42,7 @@
                 break
             end
             iter += 1
-            if iter > 10000
+            if iter > MAXITER
                 break
             end
         end
@@ -92,7 +93,7 @@
                 end
             end
             iter += 1
-            if iter > 10000
+            if iter > MAXITER
                 @warn "Failed to find the optimal solution within 10000 iterations."
                 @warn "The best solution found has cost $(best.cost)"
                 @warn "Decoded solution: $(sortperm(best.genes))"
@@ -153,8 +154,8 @@
                 end
             end
             iter += 1
-            if iter > 10000
-                @warn "Failed to find the optimal solution within 10000 iterations."
+            if iter > MAXITER
+                @warn "Failed to find the optimal solution within $MAXITER iterations."
                 @warn "The best solution found has cost $(best.cost)"
                 @warn "Decoded solution: $(sortperm(best.genes))"
                 break
