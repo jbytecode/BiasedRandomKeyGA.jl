@@ -1,5 +1,7 @@
 module BiasedRandomKeyGA
 
+using Base.Threads
+
 export BRKGA, Chromosome, Population
 export create_population, generate_mutants
 export generation, generations
@@ -285,7 +287,7 @@ end
 
 # Evaluate the cost of each chromosome in the population
 function evaluate!(ga::BRKGA, population::Population)::Nothing
-    for chrom in population
+    Threads.@threads :dynamic for chrom in population
         evaluate!(ga, chrom)
     end
     return nothing
