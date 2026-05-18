@@ -127,7 +127,7 @@ function make_blx_crossover(alpha=0.5)
     return (ga::BRKGA, parent1::Chromosome, parent2::Chromosome) -> begin
         n = length(parent1.genes)
         child = similar(parent1.genes)
-        for i in 1:n
+        @inbounds for i in 1:n
             x1, x2 = parent1.genes[i], parent2.genes[i]
             d = abs(x1 - x2)
             lower = min(x1, x2) - alpha * d
@@ -166,8 +166,7 @@ function make_sbx_crossover(nc = 20.0)
         n = length(p1.genes)
         c1 = similar(p1.genes)
         c2 = similar(p2.genes)
-        
-        for i in 1:n
+        @inbounds for i in 1:n
             if rand() <= 0.5 && abs(p1.genes[i] - p2.genes[i]) > 1e-9
                 u = rand()
                 if u <= 0.5
@@ -263,7 +262,7 @@ end
 # Function to generate mutant chromosomes
 function generate_mutants(ga::BRKGA)::Vector{Chromosome}
     mutants = Vector{Chromosome}(undef, ga.nummutants)
-    for i in 1:ga.nummutants
+    @inbounds for i in 1:ga.nummutants
         mutants[i] = Chromosome(ga.chromosome_size)
     end
     return mutants
@@ -272,7 +271,7 @@ end
 # Function to create an initial population of chromosomes
 function create_population(ga::BRKGA)::Population
     population = Vector{Chromosome}(undef, ga.population_size)
-    for i in 1:ga.population_size
+    @inbounds for i in 1:ga.population_size
         population[i] = Chromosome(ga.chromosome_size)
     end
     return population
@@ -327,7 +326,7 @@ function generation(ga::BRKGA, population::Population)::Population
     copyto!(new_population, ga.numelites + 1, mutants, 1, ga.nummutants)
 
     nextindex = ga.numelites + ga.nummutants + 1
-    for i in nextindex:ga.population_size
+    @inbounds for i in nextindex:ga.population_size
         elitistc = rand(elites)
         c = rand(population[ga.numelites+1:end]) # Select from non-elites
         new_population[i] = crossfn(ga, elitistc, c)
@@ -337,7 +336,7 @@ function generation(ga::BRKGA, population::Population)::Population
 end
 
 function generations(ga::BRKGA, population::Population, numgens::Int)::Population
-    for i in 1:numgens
+    @inbounds for i in 1:numgens
         population = generation(ga, population)
     end
     return population
